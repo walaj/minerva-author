@@ -1857,7 +1857,7 @@ def api_import():
         except Exception as e:
             print(user_facing_error_text)
             print(traceback.format_exc())
-            return api_error(500, "Error in loading channel marker names")
+            return api_error(500, "Image is missing OME-XML pixel size")
         try:
             labels = list(yield_labels(opener, csv_file, chan_label, num_channels))
         except Exception as e:
