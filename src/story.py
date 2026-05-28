@@ -37,8 +37,8 @@ def auto_threshold(img):
     lmin = x[np.argmin(np.abs(y1 - y2))]
     if lmin >= mean2:
         lmin = mean2 - 2 * std2
-    vmin = max(np.exp(lmin), img.min(), 0)
-    vmax = min(np.exp(lmax), img.max())
+    vmin = float(max(np.exp(lmin), img.min(), 0))
+    vmax = float(min(np.exp(lmax), img.max()))
 
     return vmin, vmax
 
