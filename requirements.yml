@@ -11,7 +11,7 @@ dependencies:
   - pydantic>=2.11.4
   - flask_cors>=4.0.0
   - matplotlib>=3.10.3
-  - tifffile>=2025.5.10
+  - tifffile==2025.5.10
   - scikit-learn>=1.6.1
   - scikit-image>=0.25.2
   - ome-types=0.6.0
