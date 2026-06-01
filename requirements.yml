@@ -23,3 +23,4 @@ dependencies:
   - pip>=25.1.1
   - pip:
       - openslide-python==1.4.2
+      - pyinstaller==6.10
