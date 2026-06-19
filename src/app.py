@@ -283,7 +283,7 @@ class Opener:
         self.ext = check_ext(path)
         self.default_dtype = np.uint16
 
-        if self.ext == ".ome.tif" or self.ext == ".ome.tiff":
+        if self._is_ome_tiff():
             self.reader = "tifffile"
             self.io = tifffile.TiffFile(self.path)
             self.ome_version = self._get_ome_version()
@@ -337,6 +337,25 @@ class Opener:
     def to_tsize(self):
         return 1024
 
+    def _is_ome_tiff(self):
+        """Whether this file should be read as an OME-TIFF.
+
+        The canonical .ome.tif/.ome.tiff extensions are accepted outright.
+        Valid OME-TIFFs are frequently written with a plain .tif/.tiff
+        extension (e.g. by Bio-Formats), so detect those by inspecting the
+        file itself rather than relying on the filename.
+        """
+        if self.ext in (".ome.tif", ".ome.tiff"):
+            return True
+        if self.ext in (".tif", ".tiff"):
+            try:
+                with tifffile.TiffFile(self.path) as io:
+                    return bool(io.is_ome)
+            except Exception as e:
+                print(e)
+                return False
+        return False
+
     def to_dimension(self, label, default=0):
         return self.wrapper.to_dimension(label, default)
 
@@ -353,7 +372,7 @@ class Opener:
             return 5
 
     def read_metadata(self):
-        if self.ext == ".ome.tif" or self.ext == ".ome.tiff":
+        if self.reader == "tifffile":
             try:
                 metadata = ome_types.from_tiff(self.path)
             except Exception as e:
@@ -1737,7 +1756,8 @@ def api_import():
         input_file = pathlib.Path(data["filepath"])
         input_image_file = pathlib.Path(data["filepath"])
         loading_saved_file = input_file.suffix in [".dat", ".json"]
-        root_dir = get_current_dir()
+        # Default the output next to the input data, not the launch directory
+        root_dir = os.path.dirname(os.path.abspath(str(input_file)))
 
         if not os.path.exists(input_file):
             return api_error(404, "Image file not found: " + str(input_file))
